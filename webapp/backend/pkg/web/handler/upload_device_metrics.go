@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/analogj/scrutiny/webapp/backend/pkg"
 	"github.com/analogj/scrutiny/webapp/backend/pkg/config"
@@ -51,6 +52,22 @@ func UploadDeviceMetrics(c *gin.Context) {
 	}
 
 	if smartData.Status != pkg.DeviceStatusPassed {
+
+		//check if there are any attributes that are not ignored that have failed.
+		flag := false
+		for attrId, attrData := range smartData.Attributes {
+			if slices.Contains(appConfig.GetStringSlice("notify.ignore_attribute"), attrId) {
+				continue
+			}
+			if attrData.GetStatus() != pkg.AttributeStatusPassed {
+				flag = true
+				break
+			}
+		}
+		if !flag {
+			//all failed attributes are ignored, set device status to passed.
+			smartData.Status = pkg.DeviceStatusPassed
+		}
 		//there is a failure detected by Scrutiny, update the device status on the homepage.
 		updatedDevice, err = deviceRepo.UpdateDeviceStatus(c, c.Param("wwn"), smartData.Status)
 		if err != nil {

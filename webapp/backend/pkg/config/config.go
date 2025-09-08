@@ -1,12 +1,13 @@
 package config
 
 import (
-	"github.com/analogj/go-util/utils"
-	"github.com/analogj/scrutiny/webapp/backend/pkg/errors"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/analogj/go-util/utils"
+	"github.com/analogj/scrutiny/webapp/backend/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 const DB_USER_SETTINGS_SUBKEY = "user"
@@ -40,6 +41,7 @@ func (c *configuration) Init() error {
 	c.SetDefault("log.file", "")
 
 	c.SetDefault("notify.urls", []string{})
+	c.SetDefault("notify.ignore_attributes", []string{})
 
 	c.SetDefault("web.influxdb.scheme", "http")
 	c.SetDefault("web.influxdb.host", "localhost")
